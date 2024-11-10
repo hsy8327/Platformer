@@ -1,28 +1,28 @@
 {
-  "platforms": [
-    {"x" :  0, "y":  18, "image": "assets/platforms/brick.png"},
-    {"x" :  1, "y":  18, "image": "assets/platforms/brick.png"},
-    {"x" :  2, "y":  18, "image": "assets/platforms/brick.png"},
-    {"x" :  3, "y":  18, "image": "assets/platforms/brick.png"},
-    {"x" :  4, "y":  18, "image": "assets/platforms/brick.png"},
-    {"x" :  5, "y":  18, "image": "assets/platforms/brick.png"},
-    {"x" :  6, "y":  18, "image": "assets/platforms/brick.png"},
-    {"x" :  7, "y":  18, "image": "assets/platforms/brick.png"},
-    {"x" :  8, "y":  18, "image": "assets/platforms/brick.png"},
-    {"x" :  9, "y":  18, "image": "assets/platforms/brick.png"},
-    {"x" :  10, "y":  18, "image": "assets/platforms/brick.png"},
-    {"x" :  11, "y":  18, "image": "assets/platforms/brick.png"},
-    {"x" :  12, "y":  18, "image": "assets/platforms/brick.png"},
-    {"x" :  13, "y":  18, "image": "assets/platforms/brick.png"},
-    {"x" :  14, "y":  18, "image": "assets/platforms/brick.png"},
-    {"x" :  15, "y":  18, "image": "assets/platforms/brick.png"},
-    {"x" :  16, "y":  18, "image": "assets/platforms/brick.png"},
-    {"x" :  17, "y":  18, "image": "assets/platforms/brick.png"},
-    {"x" :  18, "y":  18, "image": "assets/platforms/brick.png"},
-    {"x" :  19, "y":  18, "image": "assets/platforms/brick.png"},
-    {"x" :  20, "y":  18, "image": "assets/platforms/brick.png"}
+  "ground": [
+    {"x" :  0, "y":  18},
+    {"x" :  1, "y":  18},
+    {"x" :  2, "y":  18},
+    {"x" :  3, "y":  18},
+    {"x" :  4, "y":  18},
+    {"x" :  5, "y":  18},
+    {"x" :  6, "y":  18},
+    {"x" :  7, "y":  18},
+    {"x" :  8, "y":  18},
+    {"x" :  9, "y":  18},
+    {"x" :  10, "y":  18},
+    {"x" :  11, "y":  18},
+    {"x" :  12, "y":  18},
+    {"x" :  13, "y":  18},
+    {"x" :  14, "y":  18},
+    {"x" :  15, "y":  18},
+    {"x" :  16, "y":  18},
+    {"x" :  17, "y":  18},
+    {"x" :  18, "y":  18},
+    {"x" :  19, "y":  18},
+    {"x" :  20, "y":  18}
   ],
   "breakable_blocks" : [
-    {"x": 16, "y":  14, "image": "assets/platforms/brick.png"}
+    {"x": 16, "y":  14}
   ]
 }
