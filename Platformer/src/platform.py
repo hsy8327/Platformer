@@ -11,5 +11,5 @@ class Platform(pygame.sprite.Sprite):
             self.image.fill(GREEN)
 
         self.rect = self.image.get_rect()
-        self.rect.x = x
-        self.rect.y = y
+        self.rect.x = x * TILE_SIZE
+        self.rect.y = y * TILE_SIZE

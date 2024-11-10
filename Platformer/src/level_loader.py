@@ -1,5 +1,6 @@
 import json
 from .platform import Platform
+from .breakable_block import BreakableBlock
 
 class LevelLoader:
     def __init__(self, game, level_file):
@@ -18,3 +19,12 @@ class LevelLoader:
             )
             self.game.all_sprites.add(platform)
             self.game.platforms.add(platform)
+
+        for block_data in data.get('breakable_blocks', []):
+            block = BreakableBlock(
+                block_data['x'],
+                block_data['y'],
+                block_data['image'],
+            )
+            self.game.all_sprites.add(block)
+            self.game.breakable_blocks.add(block)

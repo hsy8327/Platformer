@@ -19,6 +19,7 @@ class Game:
         # 스프라이트 그룹
         self.all_sprites = pygame.sprite.Group()
         self.platforms = pygame.sprite.Group()
+        self.breakable_blocks = pygame.sprite.Group()
         self.player = None
 
         # 구름 및 학교 이미지 로드

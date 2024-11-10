@@ -1,7 +1,7 @@
 import pygame
 from .settings import SCREEN_WIDTH, SCREEN_HEIGHT, PLAYER_SPEED, PLAYER_JUMP_FORCE, GRAVITY, MAX_FALL_SPEED, PLAYER_IMG, \
     PLAYER_IMG_RIGHT_RUN, PLAYER_IMG_LEFT_RUN, PLAYER_IMG_RIGHT_JUMP, PLAYER_IMG_LEFT_JUMP, PLAYER_IMG_STANDING_LEFT, \
-    PLAYER_IMG_STANDING_RIGHT, JUMPING_SOUND, RUNNING_SOUND
+    PLAYER_IMG_STANDING_RIGHT, JUMPING_SOUND, RUNNING_SOUND, TILE_SIZE
 
 
 class Player(pygame.sprite.Sprite):
@@ -10,13 +10,13 @@ class Player(pygame.sprite.Sprite):
         self.game = game  # 게임 인스턴스 저장
 
         # 이미지 불러오기
-        self.standing_image = pygame.transform.scale(pygame.image.load(PLAYER_IMG).convert_alpha(), (64, 64))
-        self.right_run_image = pygame.transform.scale(pygame.image.load(PLAYER_IMG_RIGHT_RUN).convert_alpha(), (64, 64))
-        self.left_run_image = pygame.transform.scale(pygame.image.load(PLAYER_IMG_LEFT_RUN).convert_alpha(), (64, 64))
-        self.right_jump_image = pygame.transform.scale(pygame.image.load(PLAYER_IMG_RIGHT_JUMP).convert_alpha(), (64, 64))
-        self.left_jump_image = pygame.transform.scale(pygame.image.load(PLAYER_IMG_LEFT_JUMP).convert_alpha(), (64, 64))
-        self.left_mario_image = pygame.transform.scale(pygame.image.load(PLAYER_IMG_STANDING_LEFT).convert_alpha(), (64, 64))
-        self.right_mario_image = pygame.transform.scale(pygame.image.load(PLAYER_IMG_STANDING_RIGHT).convert_alpha(), (64, 64))
+        self.standing_image = pygame.transform.scale(pygame.image.load(PLAYER_IMG).convert_alpha(), (TILE_SIZE, TILE_SIZE))
+        self.right_run_image = pygame.transform.scale(pygame.image.load(PLAYER_IMG_RIGHT_RUN).convert_alpha(), (TILE_SIZE, TILE_SIZE))
+        self.left_run_image = pygame.transform.scale(pygame.image.load(PLAYER_IMG_LEFT_RUN).convert_alpha(), (TILE_SIZE, TILE_SIZE))
+        self.right_jump_image = pygame.transform.scale(pygame.image.load(PLAYER_IMG_RIGHT_JUMP).convert_alpha(), (TILE_SIZE, TILE_SIZE))
+        self.left_jump_image = pygame.transform.scale(pygame.image.load(PLAYER_IMG_LEFT_JUMP).convert_alpha(), (TILE_SIZE, TILE_SIZE))
+        self.left_mario_image = pygame.transform.scale(pygame.image.load(PLAYER_IMG_STANDING_LEFT).convert_alpha(), (TILE_SIZE, TILE_SIZE))
+        self.right_mario_image = pygame.transform.scale(pygame.image.load(PLAYER_IMG_STANDING_RIGHT).convert_alpha(), (TILE_SIZE, TILE_SIZE))
 
         self.image = self.standing_image
         self.rect = self.image.get_rect()
@@ -117,6 +117,7 @@ class Player(pygame.sprite.Sprite):
             self.rect.right = SCREEN_WIDTH
 
     def check_collision(self, direction):
+        # 플랫폼과의 충돌 처리
         hits = pygame.sprite.spritecollide(self, self.game.platforms, False)
         if hits:
             if direction == 'x':
@@ -136,4 +137,19 @@ class Player(pygame.sprite.Sprite):
         else:
             if direction == 'y':
                 self.on_ground = False
-                #self.vel 사용해서 바닥에서 걸어다닐 때만 running-sound.mp3가 나오도록 설정 (공중에서 떨어지는 과정에서도 걸어다니는 사운드가 겹쳐서 일단 수정)
+
+        #부서지는 블록 처리
+        block_hits = pygame.sprite.spritecollide(self, self.game.breakable_blocks, False)
+        if block_hits:
+            if direction == 'x':
+                # 필요에 따라 수평 충돌 처리 추가
+                pass
+            elif direction == 'y':
+                if self.vel_y < 0:  # 플레이어가 위로 점프하여 블록을 칠 때
+                    block = block_hits[0]
+                    block.break_block()  # 블록 부수기
+                    self.vel_y = 0  # 속도 조정
+                elif self.vel_y > 0:
+                    self.rect.bottom = block_hits[0].rect.top
+                    self.vel_y = 0
+                    self.on_ground = True
