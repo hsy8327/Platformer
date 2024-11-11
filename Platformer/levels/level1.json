@@ -24,5 +24,11 @@
   ],
   "breakable_blocks" : [
     {"x": 16, "y":  14}
+  ],
+  "pathable_platforms" : [
+    {"x": 12, "y": 14}
+  ],
+  "spikes" : [
+    {"x": 13, "y":  17}
   ]
 }

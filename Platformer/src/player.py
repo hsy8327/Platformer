@@ -1,3 +1,5 @@
+from math import trunc
+
 import pygame
 from .settings import SCREEN_WIDTH, SCREEN_HEIGHT, PLAYER_SPEED, PLAYER_JUMP_FORCE, GRAVITY, MAX_FALL_SPEED, PLAYER_IMG, \
     PLAYER_IMG_RIGHT_RUN, PLAYER_IMG_LEFT_RUN, PLAYER_IMG_RIGHT_JUMP, PLAYER_IMG_LEFT_JUMP, PLAYER_IMG_STANDING_LEFT, \
@@ -40,6 +42,12 @@ class Player(pygame.sprite.Sprite):
         self.running_sound = pygame.mixer.Sound(RUNNING_SOUND)
         self.is_running_sound_playing = False
 
+        #life
+        self.lives = 3
+        self.invincible = False
+        self.invincible_timer = 0
+        self.invincible_duration = 2000
+
     def handle_input(self):
         keys = pygame.key.get_pressed()
         if keys[pygame.K_LEFT]:
@@ -69,8 +77,10 @@ class Player(pygame.sprite.Sprite):
         if self.vel_y < 0:  # 점프 중일 때
             if self.facing == "right":
                 self.image = self.right_jump_image
+
             else:
                 self.image = self.left_jump_image
+
         elif self.vel_x != 0 and self.on_ground:  # 이동 중이며 바닥에 있을 때
             if not self.is_running_sound_playing:
                 self.running_sound.play(-1)  # 반복 재생
@@ -78,20 +88,28 @@ class Player(pygame.sprite.Sprite):
 
             if self.vel_x > 0:  # 오른쪽으로 이동할 때
                 self.frame_count += 1
+
                 if self.frame_count >= self.frame_delay:
                     self.frame_count = 0
+
                     if self.image == self.right_mario_image:
                         self.image = self.right_run_image
+
                     else:
                         self.image = self.right_mario_image
+
             elif self.vel_x < 0:  # 왼쪽으로 이동할 때
                 self.frame_count += 1
+
                 if self.frame_count >= self.frame_delay:
                     self.frame_count = 0
+
                     if self.image == self.left_mario_image:
                         self.image = self.left_run_image
+
                     else:
                         self.image = self.left_mario_image
+
         else:  # 멈출 때 혹은 공중에 있을 때
             if self.is_running_sound_playing:
                 self.running_sound.stop()  # 사운드 멈춤
@@ -99,8 +117,10 @@ class Player(pygame.sprite.Sprite):
 
             if self.facing == "right":
                 self.image = self.right_mario_image
+
             elif self.facing == "left":
                 self.image = self.left_mario_image
+
             else:
                 self.image = self.standing_image
 
@@ -110,6 +130,12 @@ class Player(pygame.sprite.Sprite):
         self.rect.y += self.vel_y
         self.check_collision('y')
 
+        #가시 밟는것 검사
+        self.check_spike_collision()
+
+        #무적시간 업데이트
+        self.update_invincibility()
+
         # 화면 경계 체크 (좌우)
         if self.rect.left < 0:
             self.rect.left = 0
@@ -117,6 +143,14 @@ class Player(pygame.sprite.Sprite):
             self.rect.right = SCREEN_WIDTH
 
     def check_collision(self, direction):
+
+        # 통과 가능한 플랫폼과의 충돌 처리
+        pathable_platform_hits = pygame.sprite.spritecollide(self, self.game.pathable_platforms, False)
+        if pathable_platform_hits and direction == 'y' and self.vel_y > 0:
+            self.rect.bottom = pathable_platform_hits[0].rect.top
+            self.vel_y = 0
+            self.on_ground = True
+
         # 플랫폼과의 충돌 처리
         hits = pygame.sprite.spritecollide(self, self.game.platforms, False)
         if hits:
@@ -138,11 +172,9 @@ class Player(pygame.sprite.Sprite):
             if direction == 'y':
                 self.on_ground = False
 
-        #부서지는 블록 처리
         block_hits = pygame.sprite.spritecollide(self, self.game.breakable_blocks, False)
         if block_hits:
             if direction == 'x':
-                # 필요에 따라 수평 충돌 처리 추가
                 pass
             elif direction == 'y':
                 if self.vel_y < 0:  # 플레이어가 위로 점프하여 블록을 칠 때
@@ -153,3 +185,35 @@ class Player(pygame.sprite.Sprite):
                     self.rect.bottom = block_hits[0].rect.top
                     self.vel_y = 0
                     self.on_ground = True
+
+    def check_spike_collision(self):
+        if not self.invincible:
+            if pygame.sprite.spritecollide(self, self.game.spikes, False):
+                self.take_damage()
+
+    def take_damage(self):
+        self.lives -= 1
+        print(f"{self.lives}lives left")
+        if self.lives <= 0:
+            self.game_over()
+
+        else:
+            self.invincible = True
+            self.invincible_timer = pygame.time.get_ticks()
+            # self.reset_position()
+
+
+    def update_invincibility(self):
+        if self.invincible:
+            current_time = pygame.time.get_ticks()
+            if current_time - self.invincible_timer > self.invincible_duration:
+                self.invincible = False
+
+    def reset_position(self):
+        self.rect.centerx = SCREEN_WIDTH / 2
+        self.rect.bottom = SCREEN_HEIGHT
+
+    def game_over(self):
+        print("게임 오버!")
+        self.lives = 3
+        # self.game.running = False

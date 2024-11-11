@@ -1,6 +1,5 @@
-import pygame
-from .platform import Platform
-from .settings import *
+from Platformer.src.blocks.platform import Platform
+from Platformer.src.settings import *
 
 class BreakableBlock(Platform):
     def __init__(self, x, y, image=None):

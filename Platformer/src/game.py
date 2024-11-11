@@ -1,8 +1,6 @@
-import pygame
 from .player import Player
 from .settings import *
-from .level_loader import LevelLoader
-from .platform import Platform
+from Platformer.src.blocks.level_loader import LevelLoader
 
 
 class Game:
@@ -20,6 +18,8 @@ class Game:
         self.all_sprites = pygame.sprite.Group()
         self.platforms = pygame.sprite.Group()
         self.breakable_blocks = pygame.sprite.Group()
+        self.pathable_platforms = pygame.sprite.Group()
+        self.spikes = pygame.sprite.Group()
         self.player = None
 
         # 구름 및 학교 이미지 로드
