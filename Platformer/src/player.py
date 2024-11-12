@@ -216,4 +216,8 @@ class Player(pygame.sprite.Sprite):
     def game_over(self):
         print("게임 오버!")
         self.lives = 3
+        self.reset_position()
         # self.game.running = False
+
+    def next_level(self):
+        self.game.next_level()

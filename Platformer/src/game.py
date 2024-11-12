@@ -1,6 +1,7 @@
 from .player import Player
 from .settings import *
 from Platformer.src.blocks.level_loader import LevelLoader
+import os
 
 
 class Game:
@@ -33,6 +34,9 @@ class Game:
 
         # 음악 로드
         self.background_music = BACKGROUND_MUSIC_PATH
+
+        #레벨 로드
+        self.current_level = 0
 
         # 폰트 및 이미지 로드
         self.font_path = FONT_PATH
@@ -142,4 +146,18 @@ class Game:
         self.screen.blit(self.background, (0, 0))  # 고정된 배경을 화면 전체에 배치
         for sprite in self.all_sprites:
             self.screen.blit(sprite.image, (sprite.rect.x + self.camera_offset, sprite.rect.y))
+        self.draw_lives()
         pygame.display.flip()
+
+    def draw_lives(self):
+        font = pygame.font.Font(self.font_path, 20)
+        text = font.render(f"Lives: {self.player.lives}", True, BLACK)
+        self.screen.blit(text, (10, 10))
+    # def next_level(self):
+    #     self.current_level += 1
+    #     if os.path.exists(f'levels/level{self.current_level}.json'):
+    #         self.load_level(f'levels/level{self.current_level}.json')
+    #     else:
+    #         # 게임 클리어
+    #         pass
+    #
