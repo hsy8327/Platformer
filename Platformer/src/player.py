@@ -1,6 +1,5 @@
-from math import trunc
-
 import pygame
+
 from .settings import SCREEN_WIDTH, SCREEN_HEIGHT, PLAYER_SPEED, PLAYER_JUMP_FORCE, GRAVITY, MAX_FALL_SPEED, PLAYER_IMG, \
     PLAYER_IMG_RIGHT_RUN, PLAYER_IMG_LEFT_RUN, PLAYER_IMG_RIGHT_JUMP, PLAYER_IMG_LEFT_JUMP, PLAYER_IMG_STANDING_LEFT, \
     PLAYER_IMG_STANDING_RIGHT, JUMPING_SOUND, RUNNING_SOUND, TILE_SIZE
@@ -133,64 +132,77 @@ class Player(pygame.sprite.Sprite):
         #가시 밟는것 검사
         self.check_spike_collision()
 
+        #골인지점 도착 검사
+        self.check_goal_collosion()
+
         #무적시간 업데이트
         self.update_invincibility()
 
         # 화면 경계 체크 (좌우)
         if self.rect.left < 0:
             self.rect.left = 0
-        elif self.rect.right > SCREEN_WIDTH:
-            self.rect.right = SCREEN_WIDTH
 
     def check_collision(self, direction):
+        if direction == 'y':
+            on_ground_this_frame = False  # Initialize local flag
 
-        # 통과 가능한 플랫폼과의 충돌 처리
-        pathable_platform_hits = pygame.sprite.spritecollide(self, self.game.pathable_platforms, False)
-        if pathable_platform_hits and direction == 'y' and self.vel_y > 0:
-            self.rect.bottom = pathable_platform_hits[0].rect.top
-            self.vel_y = 0
-            self.on_ground = True
+        # Check collision with pathable platforms
+        if direction == 'y':
+            pathable_platform_hits = pygame.sprite.spritecollide(self, self.game.pathable_platforms, False)
+            if pathable_platform_hits:
+                if self.vel_y >= 0:  # Falling or stationary
+                    self.rect.bottom = pathable_platform_hits[0].rect.top
+                    self.vel_y = 0
+                    on_ground_this_frame = True  # Set local flag
 
-        # 플랫폼과의 충돌 처리
-        hits = pygame.sprite.spritecollide(self, self.game.platforms, False)
-        if hits:
+        # Check collision with ground platforms
+        ground_hits = pygame.sprite.spritecollide(self, self.game.ground, False)
+        if ground_hits:
             if direction == 'x':
                 if self.vel_x > 0:
-                    self.rect.right = hits[0].rect.left
+                    self.rect.right = ground_hits[0].rect.left
                 elif self.vel_x < 0:
-                    self.rect.left = hits[0].rect.right
+                    self.rect.left = ground_hits[0].rect.right
                 self.vel_x = 0
             elif direction == 'y':
                 if self.vel_y > 0:
-                    self.rect.bottom = hits[0].rect.top
+                    self.rect.bottom = ground_hits[0].rect.top
                     self.vel_y = 0
-                    self.on_ground = True
+                    on_ground_this_frame = True  # Set local flag
                 elif self.vel_y < 0:
-                    self.rect.top = hits[0].rect.bottom
+                    self.rect.top = ground_hits[0].rect.bottom
                     self.vel_y = 0
-        else:
-            if direction == 'y':
-                self.on_ground = False
 
+        # Check collision with breakable blocks
         block_hits = pygame.sprite.spritecollide(self, self.game.breakable_blocks, False)
         if block_hits:
             if direction == 'x':
-                pass
+                pass  # Handle x-direction collisions if necessary
             elif direction == 'y':
-                if self.vel_y < 0:  # 플레이어가 위로 점프하여 블록을 칠 때
+                if self.vel_y < 0:  # Moving upwards
                     block = block_hits[0]
-                    block.break_block()  # 블록 부수기
-                    self.vel_y = 0  # 속도 조정
+                    block.break_block()  # Break the block
+                    self.vel_y = 0
                 elif self.vel_y > 0:
                     self.rect.bottom = block_hits[0].rect.top
                     self.vel_y = 0
-                    self.on_ground = True
+                    on_ground_this_frame = True  # Set local flag
+
+        # Update self.on_ground after all collision checks
+        if direction == 'y':
+            self.on_ground = on_ground_this_frame
 
     def check_spike_collision(self):
         if not self.invincible:
             if pygame.sprite.spritecollide(self, self.game.spikes, False):
                 self.take_damage()
 
+    #골인지점 도착시 처리
+    def check_goal_collosion(self):
+        if pygame.sprite.spritecollide(self, self.game.goal, False):
+            self.game.next_level()
+
+    #플레이어의 데미지 처리 메소드
     def take_damage(self):
         self.lives -= 1
         print(f"{self.lives}lives left")
@@ -219,5 +231,3 @@ class Player(pygame.sprite.Sprite):
         self.reset_position()
         # self.game.running = False
 
-    def next_level(self):
-        self.game.next_level()

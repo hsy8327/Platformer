@@ -1,3 +1,5 @@
+import pygame.sprite
+
 from .player import Player
 from .settings import *
 from Platformer.src.blocks.level_loader import LevelLoader
@@ -18,9 +20,11 @@ class Game:
         # 스프라이트 그룹
         self.all_sprites = pygame.sprite.Group()
         self.platforms = pygame.sprite.Group()
+        self.ground = pygame.sprite.Group()
         self.breakable_blocks = pygame.sprite.Group()
         self.pathable_platforms = pygame.sprite.Group()
         self.spikes = pygame.sprite.Group()
+        self.goal = pygame.sprite.Group()
         self.player = None
 
         # 구름 및 학교 이미지 로드
@@ -153,11 +157,25 @@ class Game:
         font = pygame.font.Font(self.font_path, 20)
         text = font.render(f"Lives: {self.player.lives}", True, BLACK)
         self.screen.blit(text, (10, 10))
-    # def next_level(self):
-    #     self.current_level += 1
-    #     if os.path.exists(f'levels/level{self.current_level}.json'):
-    #         self.load_level(f'levels/level{self.current_level}.json')
-    #     else:
-    #         # 게임 클리어
-    #         pass
-    #
+
+    def next_level(self):
+        self.current_level += 1
+        level_file = f'levels/level{self.current_level}.json'
+        #레벨 파일이 존재하는지 확인
+        try:
+            open(level_file, 'r').close()
+        except FileNotFoundError:
+            self.running = False    #현재는 다음 레벨이 없으면 종료
+            return
+
+        self.all_sprites.empty()
+        self.platforms.empty()
+        self.pathable_platforms.empty()
+        self.breakable_blocks.empty()
+        self.spikes.empty()
+        self.goal.empty()
+
+        self.player = Player(self)
+        self.all_sprites.add(self.player)
+
+        self.load_level(level_file)

@@ -1,14 +1,23 @@
 import pygame
+from abc import ABC, abstractmethod
 from Platformer.src.settings import *
 
-class Platform(pygame.sprite.Sprite):
-    def __init__(self, x, y, image=None):
-        if image is None:
-            image = pygame.image.load('assets/platforms/floor.png').convert_alpha()
-            image = pygame.transform.scale(image, (TILE_SIZE,TILE_SIZE))
 
-        self.image = image
+class Platform(pygame.sprite.Sprite, ABC):
+    def __init__(self, x, y, image=None):
+        super().__init__()
+        self.image = self._load_image(image)
         self.rect = self.image.get_rect()
         self.rect.x = x * TILE_SIZE
         self.rect.y = y * TILE_SIZE
-        super().__init__()
+        self.broken = False
+
+    @abstractmethod
+    def _load_image(self, image):
+
+        pass
+
+    @abstractmethod
+    def update(self):
+        # 각 블록 타입별 업데이트 로직을 구현
+        pass
