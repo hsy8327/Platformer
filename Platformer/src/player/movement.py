@@ -1,5 +1,4 @@
 import pygame
-from Platformer.src.settings import TILE_SIZE
 
 
 class PlayerMovement:
@@ -59,4 +58,3 @@ class PlayerMovement:
             physics.vel_y = physics.JUMP_RELEASE_VELOCITY
         physics.jump_pressed = False
         physics.is_jumping = False
-

@@ -1,8 +1,5 @@
-import pygame
-from Platformer.src.settings import GRAVITY, MAX_FALL_SPEED, SCREEN_WIDTH, SCREEN_HEIGHT, TILE_SIZE
+from Platformer.src.settings import GRAVITY, MAX_FALL_SPEED, SCREEN_HEIGHT, TILE_SIZE
 
-
-# physics.py
 class PlayerPhysics:
     def __init__(self):
         self.vel_x = 0

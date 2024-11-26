@@ -1,9 +1,8 @@
 import pygame.sprite
 
+from Platformer.src.blocks.level_loader import LevelLoader
 from Platformer.src.player.player import Player
 from .settings import *
-from Platformer.src.blocks.level_loader import LevelLoader
-import os
 
 
 class Game:

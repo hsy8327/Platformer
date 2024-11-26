@@ -1,13 +1,12 @@
 from Platformer.src.player.animation import *
-from Platformer.src.player.physics import *
-from Platformer.src.player.movement import *
-from Platformer.src.player.image_loader import *
 from Platformer.src.player.collision import *
+from Platformer.src.player.image_loader import *
+from Platformer.src.player.movement import *
+from Platformer.src.player.physics import *
 from Platformer.src.player.state import *
 from Platformer.src.settings import *
 
 
-# player.py (수정된 부분)
 class Player(pygame.sprite.Sprite):
     def __init__(self, game):
         super().__init__()
