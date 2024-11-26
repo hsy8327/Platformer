@@ -1,6 +1,6 @@
 import pygame.sprite
 
-from .player import Player
+from Platformer.src.player.player import Player
 from .settings import *
 from Platformer.src.blocks.level_loader import LevelLoader
 import os
@@ -155,7 +155,7 @@ class Game:
 
     def draw_lives(self):
         font = pygame.font.Font(self.font_path, 20)
-        text = font.render(f"Lives: {self.player.lives}", True, BLACK)
+        text = font.render(f"Lives: {self.player.state.lives}", True, BLACK)
         self.screen.blit(text, (10, 10))
 
     def next_level(self):
