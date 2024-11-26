@@ -61,7 +61,7 @@ class PlayerCollisionHandler:
         if block_hits:
             if player.physics.vel_y < 0:  # 점프로 부딪힘
                 block_hits[0].break_block()
-                player.physics.vel_y = 0
+                player.physics.vel_y = 0.1
             else:  # 위에 착지
                 player.rect.bottom = block_hits[0].rect.top
                 player.physics.vel_y = 0
