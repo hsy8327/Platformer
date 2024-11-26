@@ -12,7 +12,7 @@ class PlayerCollisionHandler:
         if not player.state.invincible and pygame.sprite.spritecollide(
                 player, self.game.spikes, False
         ):
-            player.take_damage()
+            self._handle_spike_collision(player)
 
         # 골 충돌 검사
         if pygame.sprite.spritecollide(player, self.game.goal, False):
@@ -83,12 +83,18 @@ class PlayerCollisionHandler:
             player.physics.vel_x = 0
             player.movement.current_speed = 0
 
+    def _handle_spike_collision(self, player):
+        """가시 충돌시 데미지와 넉백"""
+        if player.state.lives > 0:  # 아직 살아있다면
+            self._force_damage_jump(player)
+            player.take_damage()
 
-# state.py (참고용 - 이전 코드와 동일)
-class PlayerState:
-    def __init__(self):
-        self.lives = 3
-        self.invincible = False
-        self.invincible_timer = 0
-        self.invincible_duration = 2000
-        self._initialize_sound()
+    def _force_damage_jump(self, player):
+        """데미지를 입었을 때의 강제 점프"""
+        # 강제 점프 속도 설정
+        player.physics.vel_y = player.physics.DAMAGE_JUMP_VELOCITY
+        # 왼쪽으로 밀어내기
+        player.physics.vel_x = -player.movement.DAMAGE_KNOCKBACK_SPEED
+        # 점프 상태 설정
+        player.physics.is_jumping = True
+        player.movement.facing = "left"  # 왼쪽 방향으로 강제 전환

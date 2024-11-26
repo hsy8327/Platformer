@@ -38,9 +38,10 @@ class Player(pygame.sprite.Sprite):
 
     def take_damage(self):
         """데미지 처리"""
-        self.state.take_damage()
-        if self.state.lives <= 0:
-            self.game_over()
+        if not self.state.invincible:  # 이미 무적 상태가 아닐 때만 처리
+            self.state.take_damage()
+            if self.state.lives <= 0:
+                self.game_over()
 
     def update(self):
         """매 프레임 업데이트"""

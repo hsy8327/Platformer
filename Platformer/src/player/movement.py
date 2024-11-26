@@ -9,6 +9,7 @@ class PlayerMovement:
         self.WALK_DECELERATION = 0.3
         self.WALK_MAX_SPEED = 8.0
         self.RUN_MAX_SPEED = 12.0
+        self.DAMAGE_KNOCKBACK_SPEED = 100.0  # 데미지 시 밀려나는 속도
 
         # 상태 변수
         self.current_speed = 0.0

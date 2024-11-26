@@ -10,6 +10,7 @@ class PlayerPhysics:
         self.JUMP_VELOCITY = -10
         self.JUMP_RELEASE_VELOCITY = -3
         self.MAX_JUMP_HEIGHT = TILE_SIZE * 4
+        self.DAMAGE_JUMP_VELOCITY = -150  # 데미지 시 점프 속도 (일반 점프보다 약하게)
 
         # 점프 상태
         self.is_jumping = False

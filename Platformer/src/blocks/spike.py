@@ -1,5 +1,8 @@
-from .platform import Platform
+import pygame
+
 from Platformer.src.settings import *
+from .platform import Platform
+
 
 class Spike(Platform):
     def _load_image(self, image):
