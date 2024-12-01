@@ -1,25 +1,50 @@
 {
     "clouds": [
         {
-            "x": 100,
-            "y": 50,
-            "parallax": 0.2,
-            "image_path": "assets/images/cloud.png"
+            "x": 10,
+            "y": 4,
+            "parallax": 0.3,
+            "image_path": "assets/cloud.png"
         },
         {
-            "x": 400,
-            "y": 100,
-            "parallax": 0.2,
-            "image_path": "assets/images/cloud.png"
+            "x": 40,
+            "y": 10,
+            "parallax": 0.3,
+            "image_path": "assets/cloud.png"
+        },
+        {
+            "x": 60,
+            "y": 7,
+            "parallax": 0.3,
+            "image_path": "assets/cloud.png"
+        },
+        {
+            "x": 90,
+            "y": 8,
+            "parallax": 0.3,
+            "image_path": "assets/cloud.png"
+        },
+        {
+            "x": 98,
+            "y": 6,
+            "parallax": 0.3,
+            "image_path": "assets/cloud.png"
+        },
+        {
+            "x": 110,
+            "y": 8,
+            "parallax": 0.3,
+            "image_path": "assets/cloud.png"
         }
+
     ],
     "buildings": [
         {
             "type": "school",
-            "x": 1000,
-            "y": 500,
-            "parallax": 0.4,
-            "image_path": "assets/images/school.png"
+            "x": 8,
+            "y": 12,
+            "parallax": 0.1,
+            "image_path": "assets/school.png"
         }
     ],
     "background": {

@@ -1,8 +1,8 @@
 import pygame.sprite
-
 from Platformer.src.player.player import Player
 from .settings import *
 from Platformer.src.blocks.level_loader import LevelLoader
+from Platformer.src.background_loader import BackgroundLoader
 import os
 
 
@@ -29,10 +29,6 @@ class Game:
         self.goal = pygame.sprite.Group()
         self.player = None
 
-        # 구름 및 학교 이미지 로드
-        self.cloud_image = pygame.image.load(CLOUD_PATH).convert_alpha()
-        self.school_image = pygame.image.load(SCHOOL_IMG_PATH).convert_alpha()  # 학교 이미지 로드
-
         # 텍스트 깜박임 관련 설정
         self.show_text = True
         self.text_timer = 0
@@ -41,7 +37,7 @@ class Game:
         # 음악 로드
         self.background_music = BACKGROUND_MUSIC_PATH
 
-        #레벨 로드
+        # 레벨 로드
         self.current_level = 0
 
         # 폰트 및 이미지 로드
@@ -51,20 +47,26 @@ class Game:
         # 카메라 오프셋
         self.camera_offset = 0
 
-        # 고정된 배경 만들기
-        self.background = pygame.Surface((SCREEN_WIDTH, SCREEN_HEIGHT))
-        self.draw_fixed_background(self.background)
+        # BackgroundLoader 인스턴스 생성
+        self.background_loader = BackgroundLoader(self, 'assets/backgrounds/background1.json')
 
     def load_game(self):
         self.state = 'game'
         self.current_level = 1
         self.all_sprites.empty()
         self.platforms.empty()
+        self.ground.empty()
+        self.breakable_blocks.empty()
+        self.pathable_platforms.empty()
+        self.spikes.empty()
+        self.booster_pads.empty()
+        self.sticky_grounds.empty()
+        self.goal.empty()
         self.player = Player(self)
         self.all_sprites.add(self.player)
         self.load_level(f'levels/level{self.current_level}.json')
 
-        #배경음악 재생
+        # 배경음악 재생
         pygame.mixer.music.load(self.background_music)
         pygame.mixer.music.play(-1)
 
@@ -84,33 +86,11 @@ class Game:
                 self.draw()
         pygame.quit()
 
-    # todo 외부로 뺄 코드
     def update_camera(self):
         # 플레이어가 화면 중간에 닿을 때만 카메라 이동, 왼쪽으로는 이동하지 않음
         self.camera_offset = -(self.player.rect.centerx - SCREEN_WIDTH // 2)
         if self.camera_offset > 0:
             self.camera_offset = 0
-
-    def draw_fixed_background(self, surface):
-        start_color = (0, 162, 255)
-        end_color = (107, 239, 254)
-        for y in range(SCREEN_HEIGHT):
-            blend_ratio = y / SCREEN_HEIGHT
-            blended_color = (
-                int(start_color[0] + (end_color[0] - start_color[0]) * blend_ratio),
-                int(start_color[1] + (end_color[1] - start_color[1]) * blend_ratio),
-                int(start_color[2] + (end_color[2] - start_color[2]) * blend_ratio),
-            )
-            pygame.draw.line(surface, blended_color, (0, y), (SCREEN_WIDTH, y))
-
-        # 구름 이미지 (고정)
-        surface.blit(self.cloud_image, (100, 50))
-        surface.blit(self.cloud_image, (400, 100))
-
-        # School 이미지 배치
-        school_x = SCREEN_WIDTH - self.school_image.get_width() - 600  # x축
-        school_y = SCREEN_HEIGHT - self.school_image.get_height() - 35  # y축
-        surface.blit(self.school_image, (school_x, school_y))
 
     def menu_events(self):
         for event in pygame.event.get():
@@ -120,7 +100,8 @@ class Game:
                 self.load_game()
 
     def menu_draw(self):
-        self.screen.blit(self.background, (0, 0))
+        self.screen.fill((0, 0, 0))  # 배경을 검은색으로 채우기
+        self.background_loader.draw(self.screen, 0)  # 메뉴에서 배경을 그리기
         logo_x = SCREEN_WIDTH // 2 - self.title_image.get_width() // 2
         logo_y = SCREEN_HEIGHT // 2 - self.title_image.get_height()
         self.screen.blit(self.title_image, (logo_x, logo_y))
@@ -149,9 +130,15 @@ class Game:
         self.update_camera()
 
     def draw(self):
-        self.screen.blit(self.background, (0, 0))  # 고정된 배경을 화면 전체에 배치
+        # 움직이는 배경을 화면에 그리기 (카메라 오프셋 적용)
+        self.screen.fill((0, 0, 0))  # 전체 화면을 검은색으로 채워 초기화
+        self.background_loader.draw(self.screen, self.camera_offset)
+
+        # 스프라이트 그리기
         for sprite in self.all_sprites:
             self.screen.blit(sprite.image, (sprite.rect.x + self.camera_offset, sprite.rect.y))
+
+        # 라이프와 속도 정보 그리기
         self.draw_lives()
         self.draw_speed()
         pygame.display.flip()
@@ -163,17 +150,17 @@ class Game:
 
     def draw_speed(self):
         font = pygame.font.Font(self.font_path, 10)
-        text = font.render(f"speed: {self.player.movement.current_speed:.2f}", True, BLACK)
+        text = font.render(f"Speed: {self.player.movement.current_speed:.2f}", True, BLACK)
         self.screen.blit(text, (200, 10))
 
     def next_level(self):
         self.current_level += 1
         level_file = f'levels/level{self.current_level}.json'
-        #레벨 파일이 존재하는지 확인
+        # 레벨 파일이 존재하는지 확인
         try:
             open(level_file, 'r').close()
         except FileNotFoundError:
-            self.running = False    #현재는 다음 레벨이 없으면 종료
+            self.running = False  # 현재는 다음 레벨이 없으면 종료
             return
 
         self.all_sprites.empty()
