@@ -1,0 +1,31 @@
+{
+    "clouds": [
+        {
+            "x": 100,
+            "y": 50,
+            "parallax": 0.2,
+            "image_path": "assets/images/cloud.png"
+        },
+        {
+            "x": 400,
+            "y": 100,
+            "parallax": 0.2,
+            "image_path": "assets/images/cloud.png"
+        }
+    ],
+    "buildings": [
+        {
+            "type": "school",
+            "x": 1000,
+            "y": 500,
+            "parallax": 0.4,
+            "image_path": "assets/images/school.png"
+        }
+    ],
+    "background": {
+        "gradient": {
+            "start_color": [0, 162, 255],
+            "end_color": [107, 239, 254]
+        }
+    }
+}

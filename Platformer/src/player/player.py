@@ -7,7 +7,6 @@ from Platformer.src.player.state import *
 from Platformer.src.settings import *
 
 
-# player.py (수정된 부분)
 class Player(pygame.sprite.Sprite):
     def __init__(self, game):
         super().__init__()
@@ -28,7 +27,7 @@ class Player(pygame.sprite.Sprite):
         self.rect.bottom = SCREEN_HEIGHT
 
     def handle_input(self):
-        """사용자 입력 처리"""
+        # 사용자 입력 처리
         keys = pygame.key.get_pressed()
         self.movement.handle_movement(self.physics, keys)
         self.movement.handle_jump(self, self.physics, keys)
@@ -38,13 +37,13 @@ class Player(pygame.sprite.Sprite):
         self.state.update_running_sound(is_moving and self.physics.on_ground)
 
     def take_damage(self):
-        """데미지 처리"""
+        # 데미지 처리
         self.state.take_damage()
         if self.state.lives <= 0:
             self.game_over()
 
     def update(self):
-        """매 프레임 업데이트"""
+        # 매 프레임 업데이트
         self.handle_input()
         self.physics.update(self)
         self.animation.update(self, self.physics, self.movement)
@@ -58,7 +57,7 @@ class Player(pygame.sprite.Sprite):
             self.rect.left = 0
 
     def reset_position(self):
-        """위치 초기화"""
+        # 위치 초기화
         self.rect.centerx = SCREEN_WIDTH / 2
         self.rect.bottom = SCREEN_HEIGHT
         self.physics.vel_x = 0
@@ -66,7 +65,7 @@ class Player(pygame.sprite.Sprite):
         self.movement.current_speed = 0
 
     def game_over(self):
-        """게임 오버 처리"""
+        #게임 오버 처리
         print("게임 오버!")
         self.state.reset()
         self.reset_position()

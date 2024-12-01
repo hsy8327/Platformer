@@ -1,9 +1,13 @@
 import pygame
+from pygame.examples.go_over_there import MAX_SPEED
+
+from Platformer.src.player.movement import PlayerMovement
 
 
 class PlayerCollisionHandler:
     def __init__(self, game):
         self.game = game
+        self.in_sticky_ground = False  # 끈적한 지형 위에 있는지 체크
 
     def check_hazards(self, player):
         """
@@ -27,6 +31,8 @@ class PlayerCollisionHandler:
             self._check_vertical_collision(player)
         elif direction == 'x':
             self._check_horizontal_collision(player)
+
+        self._check_special_platforms(player)
 
     def _check_vertical_collision(self, player):
         """수직 방향 충돌 검사"""
@@ -62,11 +68,20 @@ class PlayerCollisionHandler:
         if block_hits:
             if player.physics.vel_y < 0:  # 점프로 부딪힘
                 block_hits[0].break_block()
-                player.physics.vel_y = 0
+                player.physics.vel_y = 0.1
             else:  # 위에 착지
                 player.rect.bottom = block_hits[0].rect.top
                 player.physics.vel_y = 0
                 on_ground_this_frame = True
+
+        booster_hits = pygame.sprite.spritecollide(
+            player, self.game.booster_pads, False
+        )
+        if booster_hits:
+            player.rect.bottom = booster_hits[0].rect.top
+            player.physics.vel_y = 0.1
+            on_ground_this_frame = True
+            booster_hits[0].apply_boost(player)
 
         player.physics.on_ground = on_ground_this_frame
 
@@ -84,12 +99,17 @@ class PlayerCollisionHandler:
             player.physics.vel_x = 0
             player.movement.current_speed = 0
 
+    def _check_special_platforms(self, player):
+        # 끈적한 지형 체크
+        sticky_hits = pygame.sprite.spritecollide(
+            player, self.game.sticky_grounds, False
+        )
 
-# state.py (참고용 - 이전 코드와 동일)
-class PlayerState:
-    def __init__(self):
-        self.lives = 3
-        self.invincible = False
-        self.invincible_timer = 0
-        self.invincible_duration = 2000
-        self._initialize_sound()
+        if sticky_hits and player.physics.on_ground:  # 땅에 닿아있을 때만 효과 적용
+            if not self.in_sticky_ground:
+                self.in_sticky_ground = True
+                sticky_hits[0].apply_effect(player)
+        else:
+            if self.in_sticky_ground:
+                self.in_sticky_ground = False
+                player.movement.remove_sticky_effect()

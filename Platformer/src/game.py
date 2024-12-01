@@ -24,6 +24,8 @@ class Game:
         self.breakable_blocks = pygame.sprite.Group()
         self.pathable_platforms = pygame.sprite.Group()
         self.spikes = pygame.sprite.Group()
+        self.booster_pads = pygame.sprite.Group()
+        self.sticky_grounds = pygame.sprite.Group()
         self.goal = pygame.sprite.Group()
         self.player = None
 
@@ -151,12 +153,18 @@ class Game:
         for sprite in self.all_sprites:
             self.screen.blit(sprite.image, (sprite.rect.x + self.camera_offset, sprite.rect.y))
         self.draw_lives()
+        self.draw_speed()
         pygame.display.flip()
 
     def draw_lives(self):
         font = pygame.font.Font(self.font_path, 20)
         text = font.render(f"Lives: {self.player.state.lives}", True, BLACK)
         self.screen.blit(text, (10, 10))
+
+    def draw_speed(self):
+        font = pygame.font.Font(self.font_path, 10)
+        text = font.render(f"speed: {self.player.movement.current_speed:.2f}", True, BLACK)
+        self.screen.blit(text, (200, 10))
 
     def next_level(self):
         self.current_level += 1

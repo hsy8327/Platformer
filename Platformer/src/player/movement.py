@@ -11,15 +11,39 @@ class PlayerMovement:
         self.WALK_MAX_SPEED = 8.0
         self.RUN_MAX_SPEED = 12.0
 
+        self.BOOSTED_MAX_SPEED = 25.0
+        self.BOOST_DURATION = 500
+
         # 상태 변수
         self.current_speed = 0.0
         self.is_running = False
+        self.is_boosted = False
+        self.boost_start_time = 0
         self.facing = "right"
 
+    def apply_sticky_effect(self, slow_factor):
+        self.current_speed *= 0.1
+
     def handle_movement(self, physics, keys):
+        current_time = pygame.time.get_ticks()
+        if physics.on_ground:
+            if self.is_boosted and current_time - self.boost_start_time > self.BOOST_DURATION:
+                self.is_boosted = False
+                # 현재 속도가 일반 최대 속도보다 높다면 조정
+                normal_max_speed = self.RUN_MAX_SPEED if self.is_running else self.WALK_MAX_SPEED
+                if abs(self.current_speed) > normal_max_speed:
+                    self.current_speed = normal_max_speed if self.current_speed > 0 else -normal_max_speed
+
         self.is_running = keys[pygame.K_LSHIFT] or keys[pygame.K_RSHIFT]
         acceleration = self.RUN_ACCELERATION if self.is_running else self.WALK_ACCELERATION
-        max_speed = self.RUN_MAX_SPEED if self.is_running else self.WALK_MAX_SPEED
+
+        # 부스터 상태일 때는 더 높은 최대 속도 적용
+        if self.is_boosted:
+            max_speed = self.BOOSTED_MAX_SPEED
+        else:
+            max_speed = self.RUN_MAX_SPEED if self.is_running else self.WALK_MAX_SPEED
+
+
 
         if keys[pygame.K_LEFT]:
             self.current_speed = max(self.current_speed - acceleration, -max_speed)
@@ -60,3 +84,7 @@ class PlayerMovement:
         physics.jump_pressed = False
         physics.is_jumping = False
 
+    def apply_boost(self, speed):
+        self.is_boosted = True
+        self.current_speed = speed
+        self.boost_start_time = pygame.time.get_ticks()
