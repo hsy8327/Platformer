@@ -63,22 +63,25 @@ class ArduinoController:
         try:
             if self.arduino.in_waiting > 0:
                 data = self.arduino.readline().strip().decode('utf-8').split(',')
-                if len(data) == 3:
+                if len(data) == 6:
                     x_axis = int(data[0])
                     button1 = bool(int(data[1]))
                     button2 = bool(int(data[2]))
+                    flex1 = int(data[3])
+                    # flex2 = int(data[4])
+                    # mic = int(data[5])
 
                     # 중앙값을 기준으로 데드존 적용
                     center = 512
                     x_normalized = x_axis if abs(x_axis - center) >= self.DEADZONE else center
 
                     self.last_input_state = {
-                        pygame.K_LEFT: x_normalized < (center - self.DEADZONE),
-                        pygame.K_RIGHT: x_normalized > (center + self.DEADZONE),
-                        pygame.K_SPACE: button1,
+                        pygame.K_LEFT: x_normalized < (center - self.DEADZONE) or (flex1 > 200 and flex1 <= 600),
+                        pygame.K_RIGHT: x_normalized > (center + self.DEADZONE), # or (flex2 > 200 and flex2 <= 600),
+                        # pygame.K_SPACE: mic > 0,
                         pygame.K_UP: button1,
-                        pygame.K_LSHIFT: button2,
-                        pygame.K_RSHIFT: button2
+                        pygame.K_LSHIFT: flex1 > 600 ,# or flex2 > 600,  # shift + 왼쪽 화살표
+                        pygame.K_RSHIFT: button2,  # shift + 오른쪽 화살표
                     }
 
             return self.last_input_state or {}
@@ -86,7 +89,6 @@ class ArduinoController:
         except Exception as e:
             print(f"Error: {e}")
             return self.last_input_state or {}
-
     def reconnect(self):
         """아두이노 재연결 시도"""
         if not self.connected:

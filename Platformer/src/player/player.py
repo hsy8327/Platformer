@@ -1,8 +1,8 @@
 from Platformer.src.player.animation import *
-from Platformer.src.player.physics import *
-from Platformer.src.player.movement import *
-from Platformer.src.player.image_loader import *
 from Platformer.src.player.collision import *
+from Platformer.src.player.image_loader import *
+from Platformer.src.player.movement import *
+from Platformer.src.player.physics import *
 from Platformer.src.player.state import *
 from Platformer.src.settings import *
 
@@ -66,6 +66,7 @@ class Player(pygame.sprite.Sprite):
 
     def game_over(self):
         #게임 오버 처리
+        self.game.game_over()
         print("게임 오버!")
-        self.state.reset()
-        self.reset_position()
+        # self.state.reset()
+        # self.reset_position()

@@ -96,6 +96,10 @@ class Game:
                 self._handle_menu()
             elif self.state == 'game':
                 self._handle_game()
+            elif self.state == 'game_over':
+                self.game_over_events()
+                self.game_over_draw()
+            # elif self.stat == 'clear':
         pygame.quit()
 
     def _handle_menu(self):
@@ -167,6 +171,57 @@ class Game:
         self._draw_lives()
         self._draw_speed()
         pygame.display.flip()
+
+    def game_over(self):
+        self.state = 'game_over'
+        pygame.mixer.music.stop()
+        if self.player:
+            self.player.state.stop_sounds()
+
+        self.captured_surface = self.screen.copy()
+        self.game_over_overlay_alpha = 0
+
+    def game_over_events(self):
+        for event in pygame.event.get():
+            if event.type == pygame.QUIT:
+                self.running = False
+            elif event.type == pygame.KEYDOWN:
+                if event.key == pygame.K_RETURN:
+                    self.state = 'menu'
+                elif event.key == pygame.K_r:
+                    self.load_game()
+
+    def game_over_draw(self):
+        if self.captured_surface:
+            self.screen.blit(self.captured_surface, (0, 0))
+
+        if self.game_over_overlay_alpha < 150:
+            self.game_over_overlay_alpha += 1
+
+        overlay = pygame.Surface((SCREEN_WIDTH, SCREEN_HEIGHT))
+        overlay.set_alpha(self.game_over_overlay_alpha)
+        overlay.fill((0, 0, 0))
+        self.screen.blit(overlay, (0, 0))
+
+        font = pygame.font.Font(self.font_path, 50)
+        text = font.render("게임 오버", True, (255, 255, 255))
+        text_rect = text.get_rect(center=(SCREEN_WIDTH // 2, SCREEN_HEIGHT // 3))
+        self.screen.blit(text, text_rect)
+
+        small_font = pygame.font.Font(self.font_path, 30)
+        menu_text = small_font.render("메뉴로 돌아가기 (Enter)", True, (255, 255, 255))
+        retry_text = small_font.render("다시하기 (R)", True, (255, 255, 255))
+
+        menu_x = SCREEN_WIDTH // 2 - menu_text.get_width() // 2
+        menu_y = SCREEN_HEIGHT // 2
+        retry_x = SCREEN_WIDTH // 2 - retry_text.get_width() // 2
+        retry_y = menu_y + 50
+
+        self.screen.blit(menu_text, (menu_x, menu_y))
+        self.screen.blit(retry_text, (retry_x, retry_y))
+
+        pygame.display.flip()
+
 
     def _draw_lives(self):
         font = pygame.font.Font(self.font_path, 20)
