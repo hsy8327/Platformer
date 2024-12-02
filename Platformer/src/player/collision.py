@@ -1,7 +1,4 @@
 import pygame
-from pygame.examples.go_over_there import MAX_SPEED
-
-from Platformer.src.player.movement import PlayerMovement
 
 
 class PlayerCollisionHandler:
@@ -17,7 +14,8 @@ class PlayerCollisionHandler:
         if not player.state.invincible and pygame.sprite.spritecollide(
                 player, self.game.spikes, False
         ):
-
+            player.tak
+            e_damage()
         # 골 충돌 검사
         if pygame.sprite.spritecollide(player, self.game.goal, False):
             self.game.next_level()
@@ -31,7 +29,6 @@ class PlayerCollisionHandler:
         elif direction == 'x':
             self._check_horizontal_collision(player)
 
-        self._check_special_platforms(player)
 
     def _check_vertical_collision(self, player):
         """수직 방향 충돌 검사"""
@@ -97,13 +94,3 @@ class PlayerCollisionHandler:
                 player.rect.left = ground_hits[0].rect.right
             player.physics.vel_x = 0
             player.movement.current_speed = 0
-
-
-        if sticky_hits and player.physics.on_ground:  # 땅에 닿아있을 때만 효과 적용
-            if not self.in_sticky_ground:
-                self.in_sticky_ground = True
-                sticky_hits[0].apply_effect(player)
-        else:
-            if self.in_sticky_ground:
-                self.in_sticky_ground = False
-                player.movement.remove_sticky_effect()

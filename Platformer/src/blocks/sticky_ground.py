@@ -1,6 +1,9 @@
 # sticky_ground.py
+import pygame
+
 from Platformer.src.blocks.platform import Platform
 from Platformer.src.settings import *
+
 
 class StickyGround(Platform):
     def __init__(self, x, y, image=None):

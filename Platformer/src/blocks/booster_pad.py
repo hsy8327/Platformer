@@ -1,6 +1,9 @@
 # booster_pad.py
+import pygame
+
 from Platformer.src.blocks.platform import Platform
 from Platformer.src.settings import *
+
 
 class BoosterPad(Platform):
     def __init__(self, x, y, direction="right", image=None):
