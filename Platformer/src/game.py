@@ -6,6 +6,7 @@ from Platformer.src.player.player import Player
 from .settings import *
 
 
+# game.py 경로: Platformer/src/game.py
 class Game:
     def __init__(self):
         pygame.init()

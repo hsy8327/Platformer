@@ -1,6 +1,9 @@
 import pygame
 
+from Platformer.src.arduino import ArduinoController
 
+
+# movement.py 경로:Platformer/src/player/movement.py
 class PlayerMovement:
     def __init__(self):
         # 이동 관련 상수
@@ -20,7 +23,13 @@ class PlayerMovement:
         self.boost_start_time = 0
         self.facing = "right"
 
-    def handle_movement(self, physics, keys):
+        # 아두이노 입력
+        self.arduino_controller = ArduinoController()
+
+    def handle_movement(self, physics, pygame_keys):
+        arduino_input = self.arduino_controller.get_input_state()
+        keys = pygame.key.get_pressed() if arduino_input is None else pygame_keys
+
         current_time = pygame.time.get_ticks()
         if physics.on_ground:
             if self.is_boosted and current_time - self.boost_start_time > self.BOOST_DURATION:
@@ -60,7 +69,10 @@ class PlayerMovement:
         else:
             self.current_speed += self.WALK_DECELERATION
 
-    def handle_jump(self, player, physics, keys):
+    def handle_jump(self, player, physics, pygame_keys):
+        arduino_input = self.arduino_controller.get_input_state()
+        keys = pygame.key.get_pressed() if arduino_input is None else pygame_keys
+
         if keys[pygame.K_SPACE]:
             if physics.on_ground and not physics.jump_pressed:
                 self._start_jump(player, physics)
