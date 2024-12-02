@@ -1,13 +1,13 @@
 import json
 
+from Platformer.src.blocks.booster_pad import BoosterPad
+from Platformer.src.blocks.breakable_block import BreakableBlock
+from Platformer.src.blocks.goal import Goal
 from Platformer.src.blocks.ground import Ground
 from Platformer.src.blocks.pathable_platforms import PathablePlatforms
-from Platformer.src.blocks.platform import Platform
-from Platformer.src.blocks.breakable_block import BreakableBlock
+from Platformer.src.blocks.solid_block import Solid_block
 from Platformer.src.blocks.spike import Spike
-from Platformer.src.blocks.goal import Goal
-from Platformer.src.blocks.booster_pad import BoosterPad
-from Platformer.src.blocks.sticky_ground import StickyGround
+
 
 class LevelLoader:
     def __init__(self, game, level_file):
@@ -25,6 +25,15 @@ class LevelLoader:
             )
             self.game.all_sprites.add(ground)
             self.game.ground.add(ground)
+
+        for solid_block_data in data.get('solid_blocks', []):
+            solid_block = Solid_block(
+                solid_block_data['x'],
+                solid_block_data['y'],
+            )
+            self.game.all_sprites.add(solid_block)
+            self.game.ground.add(solid_block)
+
 
         for block_data in data.get('breakable_blocks', []):
             block = BreakableBlock(
@@ -67,12 +76,3 @@ class LevelLoader:
             )
             self.game.all_sprites.add(booster)
             self.game.booster_pads.add(booster)
-
-        # 끈적한 지형 로드
-        for sticky_data in data.get('sticky_grounds', []):
-            sticky = StickyGround(
-                sticky_data['x'],
-                sticky_data['y']
-            )
-            self.game.all_sprites.add(sticky)
-            self.game.sticky_grounds.add(sticky)

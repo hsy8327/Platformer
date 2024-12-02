@@ -1,5 +1,4 @@
 import pygame
-from Platformer.src.settings import TILE_SIZE
 
 
 class PlayerMovement:
@@ -20,9 +19,6 @@ class PlayerMovement:
         self.is_boosted = False
         self.boost_start_time = 0
         self.facing = "right"
-
-    def apply_sticky_effect(self, slow_factor):
-        self.current_speed *= 0.1
 
     def handle_movement(self, physics, keys):
         current_time = pygame.time.get_ticks()

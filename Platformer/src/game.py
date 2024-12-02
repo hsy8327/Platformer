@@ -1,9 +1,9 @@
 import pygame.sprite
+
+from Platformer.src.background_loader import BackgroundLoader
+from Platformer.src.blocks.level_loader import LevelLoader
 from Platformer.src.player.player import Player
 from .settings import *
-from Platformer.src.blocks.level_loader import LevelLoader
-from Platformer.src.background_loader import BackgroundLoader
-import os
 
 
 class Game:
@@ -25,7 +25,7 @@ class Game:
         self.pathable_platforms = pygame.sprite.Group()
         self.spikes = pygame.sprite.Group()
         self.booster_pads = pygame.sprite.Group()
-        self.sticky_grounds = pygame.sprite.Group()
+        self.solid_blocks = pygame.sprite.Group()
         self.goal = pygame.sprite.Group()
         self.player = None
 
@@ -60,7 +60,7 @@ class Game:
         self.pathable_platforms.empty()
         self.spikes.empty()
         self.booster_pads.empty()
-        self.sticky_grounds.empty()
+        self.solid_blocks.empty()
         self.goal.empty()
         self.player = Player(self)
         self.all_sprites.add(self.player)
@@ -72,6 +72,13 @@ class Game:
 
     def load_level(self, level_file):
         level_loader = LevelLoader(self, level_file)
+        self.ground.empty()
+        self.breakable_blocks.empty()
+        self.pathable_platforms.empty()
+        self.spikes.empty()
+        self.booster_pads.empty()
+        self.solid_blocks.empty()
+        self.goal.empty()
         level_loader.load_level()
 
     def run(self):

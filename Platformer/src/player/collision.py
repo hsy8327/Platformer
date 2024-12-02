@@ -14,8 +14,7 @@ class PlayerCollisionHandler:
         if not player.state.invincible and pygame.sprite.spritecollide(
                 player, self.game.spikes, False
         ):
-            player.tak
-            e_damage()
+            player.take_damage()
         # 골 충돌 검사
         if pygame.sprite.spritecollide(player, self.game.goal, False):
             self.game.next_level()
@@ -57,6 +56,19 @@ class PlayerCollisionHandler:
                 player.rect.top = ground_hits[0].rect.bottom
                 player.physics.vel_y = 0
 
+        # 충돌 체크
+        solid_block_hits = pygame.sprite.spritecollide(
+            player, self.game.solid_blocks, False
+        )
+        if solid_block_hits:
+            if player.physics.vel_y > 0:  # 떨어지는 중
+                player.rect.bottom = solid_block_hits[0].rect.top
+                player.physics.vel_y = 0
+                on_ground_this_frame = True
+            elif player.physics.vel_y < 0:  # 점프 중
+                player.rect.top = solid_block_hits[0].rect.bottom
+                player.physics.vel_y = 0
+
         # 부서지는 블록 충돌 체크
         block_hits = pygame.sprite.spritecollide(
             player, self.game.breakable_blocks, False
@@ -93,4 +105,28 @@ class PlayerCollisionHandler:
             else:  # 왼쪽으로 이동 중
                 player.rect.left = ground_hits[0].rect.right
             player.physics.vel_x = 0
+            player.movement.current_speed = 0
+
+        solid_block_hits = pygame.sprite.spritecollide(
+            player, self.game.solid_blocks, False
+        )
+        if solid_block_hits:
+            if player.physics.vel_x > 0:  # 오른쪽으로 이동 중
+                player.rect.right = solid_block_hits[0].rect.left
+                player.physics.vel_x = 0
+            else:  # 왼쪽으로 이동 중
+                player.rect.left = solid_block_hits[0].rect.right
+                player.physics.vel_x = 0
+            player.movement.current_speed = 0
+
+        breakable_block_hits = pygame.sprite.spritecollide(
+            player, self.game.breakable_blocks, False
+        )
+        if breakable_block_hits:
+            if player.physics.vel_x > 0:  # 오른쪽으로 이동 중
+                player.rect.right = breakable_block_hits[0].rect.left
+                player.physics.vel_x = 0
+            else:  # 왼쪽으로 이동 중
+                player.rect.left = breakable_block_hits[0].rect.right
+                player.physics.vel_x = 0
             player.movement.current_speed = 0
