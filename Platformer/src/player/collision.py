@@ -16,7 +16,8 @@ class PlayerCollisionHandler:
 
         # 골 충돌 검사
         if pygame.sprite.spritecollide(player, self.game.goal, False):
-            self.game.next_level()
+            self.game.timer_running = False  # 타이머 멈추기
+            self.game.next_level()  # 클리어 처리
 
     def check_collision(self, player, direction):
         """
@@ -86,7 +87,7 @@ class PlayerCollisionHandler:
     def _handle_spike_collision(self, player):
         """가시 충돌시 데미지와 넉백"""
         if player.state.lives > 0:  # 아직 살아있다면
-            self._force_damage_jump(player)
+            #self._force_damage_jump(player)
             player.take_damage()
 
     def _force_damage_jump(self, player):

@@ -2,6 +2,7 @@ import pygame
 
 from Platformer.src.blocks.platform import Platform
 from Platformer.src.settings import *
+import pygame
 
 
 class BreakableBlock(Platform):

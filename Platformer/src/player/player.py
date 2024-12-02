@@ -1,11 +1,12 @@
-from Platformer.src.player.animation import *
-from Platformer.src.player.collision import *
-from Platformer.src.player.image_loader import *
-from Platformer.src.player.movement import *
-from Platformer.src.player.physics import *
-from Platformer.src.player.state import *
-from Platformer.src.settings import *
 
+import pygame
+from Platformer.src.player.animation import PlayerAnimation
+from Platformer.src.player.collision import PlayerCollisionHandler
+from Platformer.src.player.image_loader import PlayerImageLoader
+from Platformer.src.player.movement import PlayerMovement
+from Platformer.src.player.physics import PlayerPhysics
+from Platformer.src.player.state import PlayerState
+from Platformer.src.settings import SCREEN_WIDTH, SCREEN_HEIGHT
 
 class Player(pygame.sprite.Sprite):
     def __init__(self, game):
@@ -23,7 +24,7 @@ class Player(pygame.sprite.Sprite):
         # 기본 이미지와 rect 설정
         self.image = self.image_loader.get_image('standing')
         self.rect = self.image.get_rect()
-        self.rect.centerx = SCREEN_WIDTH / 2
+        self.rect.centerx = SCREEN_WIDTH / 5
         self.rect.bottom = SCREEN_HEIGHT
 
     def handle_input(self):
@@ -41,15 +42,14 @@ class Player(pygame.sprite.Sprite):
         if not self.state.invincible:  # 이미 무적 상태가 아닐 때만 처리
             self.state.take_damage()
             if self.state.lives <= 0:
-                self.game_over()
+                self.game.game_over()  # 생명이 다 닳으면 즉시 게임 오버
 
     def update(self):
         """매 프레임 업데이트"""
         self.handle_input()
         self.physics.update(self)
         self.animation.update(self, self.physics, self.movement)
-
-        # 위험 요소 충돌 검사
+        self.check_cutlet_collision()  # 커틀렛과의 충돌 체크
         self.collision_handler.check_hazards(self)
         self.state.update_invincibility()
 
@@ -66,7 +66,16 @@ class Player(pygame.sprite.Sprite):
         self.movement.current_speed = 0
 
     def game_over(self):
-        """게임 오버 처리"""
-        print("게임 오버!")
-        self.state.reset()
-        self.reset_position()
+        self.game.game_over()
+
+    def check_cutlet_collision(self):
+        """커틀렛과의 충돌을 체크하여 플레이어 속도를 증가시킵니다."""
+        cutlet_hits = pygame.sprite.spritecollide(self, self.game.cutlets, True)
+        if cutlet_hits:
+            print("커틀렛을 먹었습니다!")
+            for cutlet in cutlet_hits:
+                # 속도 증가 로직
+                self.movement.WALK_ACCELERATION += 2  # 더 큰 값으로 설정
+                self.movement.RUN_ACCELERATION += 2  # 더 큰 값으로 설정
+                self.movement.WALK_MAX_SPEED += 1  # 걸음 속도의 최대값 증가
+                self.movement.RUN_MAX_SPEED += 1  # 달리기 속도의 최대값 증가

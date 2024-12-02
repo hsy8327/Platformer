@@ -1,3 +1,4 @@
+
 import json
 
 from Platformer.src.blocks.ground import Ground
@@ -6,6 +7,7 @@ from Platformer.src.blocks.platform import Platform
 from Platformer.src.blocks.breakable_block import BreakableBlock
 from Platformer.src.blocks.spike import Spike
 from Platformer.src.blocks.goal import Goal
+from Platformer.src.blocks.cutlet import Cutlet  # 커틀렛 클래스 임포트
 
 class LevelLoader:
     def __init__(self, game, level_file):
@@ -55,3 +57,11 @@ class LevelLoader:
             )
             self.game.all_sprites.add(goal)
             self.game.goal.add(goal)
+
+        for cutlet_data in data.get('cutlets', []):  # 커틀렛 데이터 추가
+            cutlet = Cutlet(
+                cutlet_data['x'],
+                cutlet_data['y'],
+            )
+            self.game.all_sprites.add(cutlet)
+            self.game.cutlets.add(cutlet)  # 커틀렛 그룹에 추가

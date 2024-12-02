@@ -62,3 +62,7 @@ class PlayerState:
         self.invincible = False
         self.invincible_timer = 0
 
+    def stop_sounds(self):
+        """모든 사운드를 중지합니다."""
+        self.running_sound.stop()
+        self.is_running_sound_playing = False
