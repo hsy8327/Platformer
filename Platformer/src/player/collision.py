@@ -17,7 +17,6 @@ class PlayerCollisionHandler:
         if not player.state.invincible and pygame.sprite.spritecollide(
                 player, self.game.spikes, False
         ):
-            player.take_damage()
 
         # 골 충돌 검사
         if pygame.sprite.spritecollide(player, self.game.goal, False):
@@ -99,11 +98,6 @@ class PlayerCollisionHandler:
             player.physics.vel_x = 0
             player.movement.current_speed = 0
 
-    def _check_special_platforms(self, player):
-        # 끈적한 지형 체크
-        sticky_hits = pygame.sprite.spritecollide(
-            player, self.game.sticky_grounds, False
-        )
 
         if sticky_hits and player.physics.on_ground:  # 땅에 닿아있을 때만 효과 적용
             if not self.in_sticky_ground:

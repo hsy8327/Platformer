@@ -1,4 +1,3 @@
-import pygame
 
 #화면설정
 SCREEN_WIDTH = 1024

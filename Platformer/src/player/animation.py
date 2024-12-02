@@ -1,6 +1,5 @@
 from Platformer.src.player.image_loader import *
 
-
 class PlayerAnimation:
     def __init__(self):
         self.frame_count = 0
