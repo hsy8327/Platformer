@@ -1,119 +1,45 @@
-import time
-
 import pygame
 import serial
-import serial.tools.list_ports
-
-
-def find_arduino_port():
-    ports = list(serial.tools.list_ports.comports())
-
-    # 더 많은 식별자 추가
-    arduino_identifiers = [
-        'Arduino',
-        'CH340',
-        'USB Serial',
-        'USB-Serial',
-        'USB2.0-Serial',
-        'ttyUSB',
-        'ttyACM'
-    ]
-
-    for p in ports:
-        # description과 hwid 모두 확인
-        if any(id in p.description or id in p.hwid for id in arduino_identifiers):
-            return p.device
-
-    print("사용 가능한 포트:", [p.device for p in ports])
-    return None  # 기본값 제거, 연결되지 않았을 때 None 반환
 
 
 class ArduinoController:
-    def __init__(self, baudrate=115200):
-        """아두이노 컨트롤러 초기화"""
-        self.arduino = None
-        self.last_input_state = {}
-        self.connected = False
-        self.DEADZONE = 50  # 데드존 값 설정
-
-        # 아두이노 포트 찾기 및 연결
-        self.connect_to_arduino(baudrate)
-
-    def connect_to_arduino(self, baudrate):
-        port = find_arduino_port()
-        if port:
-            try:
-                self.arduino = serial.Serial(port, baudrate, timeout=0.01)
-                print(f"아두이노가 {port}에 연결되었습니다.")
-                self.connected = True
-                # 아두이노 재설정 대기
-                time.sleep(2)
-                # 버퍼 비우기
-                self.arduino.flushInput()
-            except serial.SerialException as e:
-                print(f"아두이노 연결 오류: {e}")
-                print("키보드 모드로 전환합니다.")
-        else:
-            print("아두이노를 찾을 수 없습니다. 키보드 모드로 전환합니다.")
-
-    def get_input_state(self):
-        if not self.connected or not self.arduino:
-            return self.last_input_state or {}
-
+    def __init__(self, port='/dev/ttyUSB0'):
         try:
-            if self.arduino.in_waiting > 0:
-                data = self.arduino.readline().strip().decode('utf-8').split(',')
-                if len(data) == 3:
-                    x_axis = int(data[0])
-                    button1 = bool(int(data[1]))
-                    button2 = bool(int(data[2]))
-
-                    # 중앙값을 기준으로 데드존 적용
-                    center = 512
-                    x_normalized = x_axis if abs(x_axis - center) >= self.DEADZONE else center
-
-                    self.last_input_state = {
-                        pygame.K_LEFT: x_normalized < (center - self.DEADZONE),
-                        pygame.K_RIGHT: x_normalized > (center + self.DEADZONE),
-                        pygame.K_SPACE: button1,
-                        pygame.K_UP: button1,
-                        pygame.K_LSHIFT: button2,
-                        pygame.K_RSHIFT: button2
-                    }
-
-            return self.last_input_state or {}
-
-        except Exception as e:
-            print(f"Error: {e}")
-            return self.last_input_state or {}
-
-    def reconnect(self):
-        """아두이노 재연결 시도"""
-        if not self.connected:
-            port = find_arduino_port()
-            if port:
-                try:
-                    if self.arduino:
-                        self.arduino.close()
-                    self.arduino = serial.Serial(port, 2000000, timeout=0.01)  # 속도 일관성 유지
-                    self.connected = True
-                    print(f"아두이노 재연결 성공: {port}")
-                    time.sleep(2)
-                    self.arduino.flushInput()
-                except serial.SerialException as e:
-                    print(f"아두이노 재연결 실패: {e}")
-
-    def close(self):
-        """시리얼 연결 종료"""
-        if self.arduino:
+            self.serial = serial.Serial(port, 9600)
+        except serial.SerialException:
             try:
-                self.arduino.close()
-                self.connected = False
-                print("아두이노 연결이 종료되었습니다.")
-            except serial.SerialException as e:
-                print(f"아두이노 연결 종료 오류: {e}")
+                self.serial = serial.Serial('/dev/ttyACM0', 9600)
+            except serial.SerialException:
+                print("아두이노 연결 실패. 키보드 입력만 사용합니다.")
+                self.serial = None
 
-    def __del__(self):
-        """소멸자에서 연결 종료"""
-        self.close()
+        self.x_value = 512
+        self.button1 = 0
+        self.button2 = 0
 
+    def update(self):
+        if self.serial and self.serial.in_waiting:
+            try:
+                data = self.serial.readline().decode().strip().split(',')
+                if len(data) == 3:
+                    self.x_value = int(data[0])
+                    self.button1 = int(data[1])
+                    self.button2 = int(data[2])
+            except:
+                pass
+
+    def get_input_state(self, keys):
+        if self.serial:
+            self.update()
+            return (
+                self.x_value < 400 or keys[pygame.K_LEFT],
+                self.x_value > 600 or keys[pygame.K_RIGHT],
+                bool(self.button1) or keys[pygame.K_SPACE],
+                bool(self.button2) or keys[pygame.K_LSHIFT]
+            )
+        return (
+            keys[pygame.K_LEFT],
+            keys[pygame.K_RIGHT],
+            keys[pygame.K_SPACE],
+            keys[pygame.K_LSHIFT]
+        )
