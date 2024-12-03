@@ -99,8 +99,60 @@ class Game:
             elif self.state == 'game_over':
                 self.game_over_events()
                 self.game_over_draw()
-            # elif self.stat == 'clear':
+            elif self.state == 'clear':
+                self.clear_events()
+                self.clear_draw()
         pygame.quit()
+
+    def load_next_level(self):
+        self.next_level()
+
+    def game_clear(self):
+        self.state = 'clear'
+        pygame.mixer.music.stop()
+        self.player.state.stop_sounds()
+        self.captured_surface = self.screen.copy()
+        self.game_clear_overlay_alpha = 0
+
+    def clear_events(self):
+
+        for event in pygame.event.get():
+            if event.type == pygame.QUIT:
+                self.running = False
+            elif event.type == pygame.KEYDOWN:
+                if event.key == pygame.K_h:  # 홈 메뉴로 돌아가기
+                    self.state = 'menu'
+                elif event.key == pygame.K_c:  # 다음 스테이지로 도전하기
+                    self.load_next_level()
+
+    def clear_draw(self):
+        if self.captured_surface:
+            self.screen.blit(self.captured_surface, (0, 0))  # 캡처한 화면 그리기
+
+        # 클리어 메시지
+        big_font = pygame.font.Font(self.font_path, 50)
+        clear_text = big_font.render("클리어!", True, (255, 255, 255))
+        clear_x = SCREEN_WIDTH // 2 - clear_text.get_width() // 2
+        clear_y = SCREEN_HEIGHT // 3 - clear_text.get_height() // 2
+        self.screen.blit(clear_text, (clear_x, clear_y))
+
+        # 홈 및 도전 버튼
+        small_font = pygame.font.Font(self.font_path, 30)
+
+        # 홈으로 돌아가기 버튼
+        home_text = small_font.render("홈으로 돌아가기 (H)", True, (255, 255, 255))
+        home_x = SCREEN_WIDTH // 2 - home_text.get_width() // 2
+        home_y = clear_y + 100  # 저장하기 버튼 위쪽에 위치
+        self.screen.blit(home_text, (home_x, home_y))
+        self.home_button_rect = home_text.get_rect(center=(SCREEN_WIDTH // 2, home_y))  # 홈 버튼 위치
+
+        # 도전하기 버튼
+        challenge_text = small_font.render("도전하기 (C)", True, (255, 255, 255))
+        challenge_x = SCREEN_WIDTH // 2 - challenge_text.get_width() // 2
+        challenge_y = home_y + 50  # 홈 위쪽에 위치
+        self.screen.blit(challenge_text, (challenge_x, challenge_y))
+
+        pygame.display.flip()
 
     def _handle_menu(self):
         self.menu_events()
@@ -247,3 +299,6 @@ class Game:
         self.player = Player(self)
         self.all_sprites.add(self.player)
         self.load_level(level_file)
+        self.player.state.stop_sounds()
+        self.state = 'game'
+        pygame.mixer.music.play(-1)

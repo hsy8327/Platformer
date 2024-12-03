@@ -17,7 +17,7 @@ class PlayerCollisionHandler:
             player.take_damage()
         # 골 충돌 검사
         if pygame.sprite.spritecollide(player, self.game.goal, False):
-            self.game.next_level()
+            self.game.game_clear()
 
     def check_collision(self, player, direction):
         """
